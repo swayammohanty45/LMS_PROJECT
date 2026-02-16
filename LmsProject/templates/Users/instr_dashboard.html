@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="{% static 'css/style2.css' %}" rel="stylesheet">
+  <style>
+  .sidebar {
+    height: 100vh;
+    background: #343a40;
+    color: white;
+    padding-top: 20px;
+    position: fixed;
+    width: 220px;
+  }
+
+  .sidebar a {
+    display: block;
+    color: #ddd;
+    padding: 10px 16px;  /* reduced padding */
+    text-decoration: none;
+    font-size: 14px;     /* smaller font */
+  }
+
+  .sidebar a:hover {
+    background: #495057;
+    color: #fff;
+  }
+
+  main {
+    margin-left: 240px;
+    padding: 15px; /* reduced main padding */
+  }
+
+  .card {
+    border-radius: 5px;
+    margin-bottom: 6px; /* less gap between cards */
+  }
+
+  .card-body {
+    padding: 8px; /* reduce internal spacing */
+  }
+
+  .list-group-item {
+    padding: 8px 7px; /* tighter list spacing */
+  }
+
+  .list-group-item ul {
+    margin-top: 4px;
+  }
+
+  .list-group-item li {
+    font-size: 14px;
+    padding: 4px 0; /* compact lesson list */
+  }
+
+  .badge {
+    font-size: 11px; 
+    padding: 4px 6px; /* smaller badges */
+  }
+
+  .btn-sm {
+    padding: 3px 6px;
+    font-size: 12px; /* compact small buttons */
+  }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav class="col-md-2 sidebar d-flex flex-column">
+        <h3 class="p-3 text-warning">Instructor Panel</h3>
+        <a href="{% url 'instr_dashboard' %}"><i class="fas fa-book"></i> Dashboard</a>
+        <a href="{% url 'manage_lessons' %}"><i class="fas fa-chalkboard-teacher"></i> Manage Lessons</a>
+        <a href="{% url 'instr_quizzes' %}"><i class="fas fa-question-circle"></i> Quizzes</a>
+        <a href="{% url 'manage_instr_students' %}">Manage Students</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+      <!-- Main Content -->
+      <main class="col-md-10 p-4">
+        <div class="dashboard-header mb-4">
+          <h2>Welcome, {{ user.name }}</h2>
+          <p class="text-muted">Quick overview of your courses, lessons, and quizzes</p>
+        </div>
+        <!-- Stats -->
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <div class="card border-left-info shadow h-100 py-2">
+              <div class="card-body">
+                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Active Courses</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ count }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="card border-left-danger shadow h-100 py-2">
+              <div class="card-body">
+                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Enrolled Students</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ students }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Add New Course -->
+        <div class="card shadow mb-4">
+          <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Add New Course</h6>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="{% url 'add_course' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="title" class="form-label">Course Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Add Course</button>
+            </form>
+          </div>
+        </div>
+        <!-- Courses, Lessons, and Quizzes -->
+        <div class="card shadow mb-4">
+          <div class="card-header py-3 bg-primary text-white">
+            <h6 class="m-0 font-weight-bold">Your Courses</h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              {% for c in course_data %}
+              <li class="list-group-item mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="fw-bold">{{ c.course.title }}
+                    <span class="badge bg-info ms-2">{{ c.students }} Students</span>
+                  </div>
+                  <a href="{% url 'add_lesson' c.course.id %}" class="btn btn-sm btn-success">
+                    <i class="fas fa-plus"></i> Add Lesson
+                  </a>
+                </div>
+                <ul class="mt-2">
+                  {% for l in c.lessons %}
+                  <li class="mb-2 d-flex justify-content-between align-items-center">
+                    {{ l.lesson.title }}
+                    <div>
+                      {% if l.quiz %}
+                      <a href="{% url 'add_quiz' l.quiz.id %}" class="btn btn-sm btn-warning ms-2">
+                        <i class="fas fa-question-circle"></i> Quiz
+                      </a>
+                      <span class="badge bg-info ms-1">Attempts: {{ l.quiz.attempted_students }}</span>
+                      <span class="badge bg-success ms-1">Grade: {{ l.quiz.avg_score }}%</span>
+                      {% else %}
+                      <a href="{% url 'add_quiz' l.lesson.id %}" class="btn btn-sm btn-warning ms-2">
+                        <i class="fas fa-question-circle"></i> Add Quiz
+                      </a>
+                      {% endif %}
+                    </div>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% empty %}
+              <li class="list-group-item text-muted">No courses yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

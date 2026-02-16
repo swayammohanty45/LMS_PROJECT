@@ -1,0 +1,42 @@
+        body {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            min-width: 220px;
+            max-width: 220px;
+            background: #4e73df;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .sidebar h3 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #495057;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        table th,
+        table td {
+            vertical-align: middle !important;
+        }

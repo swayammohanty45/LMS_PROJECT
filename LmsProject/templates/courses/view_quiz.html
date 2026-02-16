@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Quiz</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h5>Course: {{ quiz.lesson.course.title }}</h5>
+  <h5>Lesson: {{ quiz.lesson.title }}</h5>
+  <h5>Quiz: {{ quiz.title }}</h5>
+  <hr>
+  {% if questions %}
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Question</th>
+        <th>Option A</th>
+        <th>Option B</th>
+        <th>Option C</th>
+        <th>Option D</th>
+        <th>Answer</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for q in questions %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ q.text }}</td>
+        <td>{{ q.optionA }}</td>
+        <td>{{ q.optionB }}</td>
+        <td>{{ q.optionC }}</td>
+        <td>{{ q.optionD }}</td>
+        <td><span class="badge bg-success">{{ q.answer }}</span></td>
+        <td>
+          <a href="{% url 'edit_question' q.id %}" class="btn btn-sm btn-warning">Edit</a>
+          <a href="{% url 'delete_question' q.id %}" 
+             onclick="return confirm('Are you sure you want to delete this question?');"
+             class="btn btn-sm btn-danger">Delete</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="alert alert-info">No questions added yet.</div>
+  {% endif %}
+  <a href="{% url 'add_question' quiz.id %}" class="btn btn-success">+Add Question</a>
+  <a href="{% url 'instr_quizzes' %}" class="btn btn-secondary">Back to Quiz List</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center mb-4">Register</h2>
+
+                <form method="post" class="border p-4 rounded shadow">
+                    {% csrf_token %}
+                    
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" id="name" 
+                               placeholder="Enter your name" value="{{ request.POST.name }}">
+                        {% if errors.name %}
+                            <small class="text-danger">{{ errors.name }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" id="email" 
+                               placeholder="Enter your email" value="{{ request.POST.email }}">
+                        {% if errors.email %}
+                            <small class="text-danger">{{ errors.email }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+                        {% if errors.password %}
+                            <small class="text-danger">{{ errors.password }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Role -->
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" name="role" id="role">
+                            <option value="student" {% if request.POST.role == "student" %}selected{% endif %}>Student</option>
+                            <option value="instructor" {% if request.POST.role == "instructor" %}selected{% endif %}>Instructor</option>
+                            <option value="admin" {% if request.POST.role == "admin" %}selected{% endif %}>Admin</option>
+                        </select>
+                        {% if errors.role %}
+                            <small class="text-danger">{{ errors.role }}</small>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+
+                <p class="text-center mt-3">
+                    Already have an account? <a href="{% url 'login' %}">Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

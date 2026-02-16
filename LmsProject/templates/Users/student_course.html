@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>{{ course.title }}</h3>
+<ul>
+  {% for lesson in lessons %}
+    <li>
+      {{ lesson.title }}
+      {% if lesson_progress.lesson.id %}
+        <span>Completed</span>
+      {% else %}
+        <a href="{% url 'lesson_detail' lesson.id %}">Start Lesson</a>
+      {% endif %}
+      {% if lesson.quiz %}
+        {% if lesson.quiz.id in quiz_attempts %}
+          <span>Grade: {{ quiz_attempts.lesson.quiz.id.score }}/{{ quiz_attempts.lesson.quiz.id.total }}</span>
+        {% else %}
+          <a href="{% url 'quiz' lesson.quiz.id %}">Take Quiz</a>
+        {% endif %}
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+
+</body>
+</html>

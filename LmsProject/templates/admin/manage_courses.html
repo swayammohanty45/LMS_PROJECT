@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Manage Courses</h2>
+
+  {% for course in courses %}
+    <div class="card mt-3 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        {{ course.title }}
+      </div>
+      <div class="card-body">
+        <p><strong>Description:</strong> {{ course.description }}</p>
+        <p><strong>Instructor:</strong> {{ course.instructor }}</p>
+        <h5>Lessons</h5>
+        <ul class="list-group">
+          {% for lesson in course.lesson_set.all %}
+            <li class="list-group-item">
+              {{ lesson.title }}
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No lessons added yet</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

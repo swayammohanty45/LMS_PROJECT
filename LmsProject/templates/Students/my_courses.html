@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Courses</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; }
+    .course-card { border-radius: 10px; margin-bottom: 20px; }
+    .lesson-card { border-radius: 8px; margin-bottom: 10px; padding: 12px; border: 1px solid #dee2e6; }
+    .lesson-title { font-weight: 600; color: #0d6efd; }
+    .quiz-badge { font-size: 0.85rem; }
+    .video-container { margin-top: 8px; margin-bottom: 8px; }
+    .card-header { font-size: 1.25rem; font-weight: 600; }
+    .back-btn { margin-bottom: 15px; }
+    .feedback-btn { margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="container mt-4">
+
+  <!-- Back to Dashboard button -->
+  <a href="{% url 'student_dashboard' %}" class="btn btn-secondary back-btn">&larr; Back to Dashboard</a>
+
+  <div class="mb-3">
+    <h2 class="mb-1">Hello, {{ student.name }}</h2>
+    <p class="text-muted">Your enrolled courses and lessons</p>
+  </div>
+
+  {% if courses_data %}
+    {% for c in courses_data %}
+      <div class="card shadow-sm course-card">
+        <div class="card-header bg-primary text-white">{{ c.course.title }}</div>
+        <div class="card-body">
+          {% if c.lessons %}
+            {% for l in c.lessons %}
+              <div class="lesson-card">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="lesson-title">Lesson-{{ forloop.counter }}. {{ l.lesson.title }}</span>
+                  {% if l.quiz %}
+                    {% if l.quiz_attempt %}
+                      <span class="badge bg-success quiz-badge">
+                        Quiz Completed: {{ l.quiz_attempt.score }}/{{ l.quiz.question_set.count }}
+                      </span>
+                    {% else %}
+                      <a href="{% url 'quiz' l.quiz.id %}" class="btn btn-warning btn-sm">Take Quiz</a>
+                    {% endif %}
+                  {% endif %}
+                </div>
+                <p class="mt-2">{{ l.lesson.text|linebreaks }}</p>
+                {% if l.lesson.video %}
+                  <div class="video-container">
+                    <video width="100%" height="240" controls>
+                      <source src="{{ l.lesson.video.url }}" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted">No lessons available yet.</p>
+          {% endif %}
+
+          <!-- Feedback button (shown only if all quizzes completed) -->
+          {% if c.completed %}
+            <a href="{% url 'course_feedback' c.course.id %}" class="btn btn-primary feedback-btn">
+              Give Feedback
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">You are not enrolled in any courses yet.</p>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

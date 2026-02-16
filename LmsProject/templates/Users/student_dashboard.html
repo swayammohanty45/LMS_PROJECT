@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f8f9fc;
+    }
+
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #343a40;
+      color: white;
+      padding-top: 20px;
+    }
+
+    .sidebar h3 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #ffc107;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #ddd;
+      padding: 12px 20px;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      background: #495057;
+      color: #fff;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 20px;
+    }
+
+    .card {
+      border-radius: 10px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    section {
+      scroll-margin-top: 80px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <h3>Student Panel</h3>
+    <a href="{% url 'student_my_courses' %}"><i class="fas fa-book-reader"></i> My Courses</a>
+    <a href="{% url 'student_progress' %}"><i class="fas fa-tasks"></i> Progress</a>
+    <a href="{% url 'student_certificates' %}"><i class="fas fa-certificate"></i> Certificates</a>
+    <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="dashboard-header">
+      <h2>Welcome, {{ student.name }}</h2>
+      <span class="bagdge bg-success fw-bold">Student Dashboard</span>
+    </div>
+    <!-- Progress Overview -->
+    <section id="progress">
+      <h4>Progress Overview</h4>
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card shadow text-center p-3">
+            <i class="fas fa-book fa-2x text-primary mb-2"></i>
+            <h5>Courses Enrolled</h5>
+            <p class="fs-4 fw-bold">{{ courses|length }}</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card shadow text-center p-3">
+            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+            <h5>Lessons Completed</h5>
+            <p class="fs-4 fw-bold">{{ quizzes_attempted }}</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card shadow text-center p-3">
+            <i class="fas fa-question-circle fa-2x text-warning mb-2"></i>
+            <h5>Quizzes Attempted</h5>
+            <p class="fs-4 fw-bold">{{ quizzes_attempted }}</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card shadow text-center p-3">
+            <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+            <h5>Progress</h5>
+            <p class="fs-4 fw-bold">{{ progress }}%</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- My Courses -->
+    <section id="my-courses">
+      <h4>My Courses</h4>
+      <div class="card shadow mb-4 p-3">
+        {% if courses %}
+        <ul class="list-group">
+          {% for enrollment in courses %}
+          <li class="list-group-item">
+            <strong>{{ enrollment.course.title }}</strong>
+            <span class="badge bg-success float-end">{{ enrollment.progress }}%</span>
+            <ul><strong><u>Lesson</u></strong></ul>
+            <ul class="mt-2">
+              {% for lesson in enrollment.course.lesson_set.all %}
+              <li class="d-flex justify-content-between align-items-center">
+                {{ lesson.title }}
+                <div class="mb-3 d-flex align-items-center gap-2">
+                  {% if lesson.quiz %}
+                  <a href="{% url 'quiz' lesson.quiz.id %}" class="btn btn-sm btn-warning">Take Quiz</a>
+                  {% for attempt in quiz_attempts %}
+                  {% if attempt.quiz_id == lesson.quiz.id %}
+                  <span class="badge bg-info">
+                    Grade: {{ attempt.score }}/{{ lesson.quiz.question_set.count }}
+                  </span>
+                  {% endif %}
+                  {% endfor %}
+                  {% else %}
+                  <span class="text-muted">No quiz</span>
+                  {% endif %}
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">You have not enrolled in any courses yet.</p>
+        {% endif %}
+      </div>
+    </section>
+    <!-- Available Courses -->
+    <section id="available-courses">
+      <h4>Available Courses</h4>
+      <div class="row">
+        {% if available_courses %}
+        {% for c in available_courses %}
+        <div class="col-md-4 mb-3">
+          <div class="card shadow h-100 p-3">
+            <h5>{{ c.title }}</h5>
+            <p>{{ c.description|truncatewords:20 }}</p>
+            <a href="{% url 'enroll_course' c.id %}" class="btn btn-primary">Enroll</a>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="text-muted">No courses available to enroll.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

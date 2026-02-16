@@ -1,0 +1,29 @@
+body {
+    background-color: #f8f9fc;
+}
+
+.sidebar {
+    min-height: 100vh;
+    background: #4e73df;
+    color: white;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 12px 20px;
+    font-weight: 500;
+}
+
+.sidebar a:hover {
+    background: #2e59d9;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.dashboard-header {
+    margin-bottom: 25px;
+}
